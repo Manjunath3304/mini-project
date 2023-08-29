@@ -1,0 +1,222 @@
+# Banking Bot
+# A program that can be used to interact with customers, analyze their queries, and perform tasks accordingly
+
+# Importing the required modules
+import re
+import random
+
+# Defining some sample data for demonstration purposes
+# A dictionary of customers with their account numbers and balances
+customers = {
+    "Alice": {"account_number": "1234567890", "balance": 10000},
+    "Bob": {"account_number": "0987654321", "balance": 5000},
+    "Charlie": {"account_number": "1111222233", "balance": 3000}
+}
+
+# A dictionary of transactions with their dates and amounts
+transactions = {
+    "1234567890": [
+        {"date": "01/01/2023", "amount": -1000, "description": "ATM withdrawal"},
+        {"date": "05/01/2023", "amount": 2000, "description": "Salary credit"},
+        {"date": "10/01/2023", "amount": -500, "description": "Online shopping"}
+    ],
+    "0987654321": [
+        {"date": "02/01/2023", "amount": -2000, "description": "Bill payment"},
+        {"date": "06/01/2023", "amount": 1000, "description": "Interest credit"},
+        {"date": "15/01/2023", "amount": -1000, "description": "Loan repayment"}
+    ],
+    "1111222233": [
+        {"date": "03/01/2023", "amount": -500, "description": "Grocery purchase"},
+        {"date": "07/01/2023", "amount": 500, "description": "Cashback reward"},
+        {"date": "12/01/2023", "amount": -1000, "description": "Restaurant bill"}
+    ]
+}
+
+# Defining some sample responses for different scenarios
+greetings = ["Hello", "Hi", "Welcome", "Good day"]
+farewells = ["Goodbye", "Bye", "Take care", "Have a nice day"]
+confirmations = ["Yes", "Sure", "Of course", "Certainly"]
+rejections = ["No", "Sorry", "Unfortunately", "I'm afraid not"]
+apologies = ["Sorry", "Apologies", "Regret", "Pardon"]
+appreciations = ["Thank you", "Thanks", "Grateful", "Appreciate"]
+acknowledgements = ["OK", "Alright", "Got it", "Understood"]
+clarifications = ["Please repeat that", 
+                  "Please say that again",
+                  "I didn't catch that",
+                  "I didn't understand that"]
+
+# Defining a function to generate a random response from a list of responses
+def random_response(responses):
+    return random.choice(responses)
+
+# Defining a function to check if a query is a greeting
+def is_greeting(query):
+    # A list of possible greetings
+    greeting_words = ["hello", 
+                      'hi', 
+                      'hey', 
+                      'good morning', 
+                      'good afternoon', 
+                      'good evening', 
+                      'good day']
+    # Converting the query to lower case and removing punctuation
+    query = query.lower().strip(".?!")
+    # Checking if the query is in the list of greetings
+    return query in greeting_words
+
+# Defining a function to check if a query is a farewell
+def is_farewell(query):
+    # A list of possible farewells
+    farewell_words = ["goodbye",
+                      'bye',
+                      'see you',
+                      'take care',
+                      'have a nice day']
+    # Converting the query to lower case and removing punctuation
+    query = query.lower().strip(".?!")
+    # Checking if the query is in the list of farewells
+    return query in farewell_words
+
+# Defining a function to check if a query is asking for the balance
+def is_balance_query(query):
+    # A regular expression pattern to match balance queries
+    balance_pattern = r"(balance|account|statement)"
+    # Converting the query to lower case and removing punctuation
+    query = query.lower().strip(".?!")
+    # Checking if the query matches the balance pattern
+    return re.search(balance_pattern, query) is not None
+
+# Defining a function to check if a query is asking for the transactions
+def is_transaction_query(query):
+    # A regular expression pattern to match transaction queries
+    transaction_pattern = r"(transaction|history|activity|detail)"
+    # Converting the query to lower case and removing punctuation
+    query = query.lower().strip(".?!")
+    # Checking if the query matches the transaction pattern
+    return re.search(transaction_pattern, query) is not None
+
+# Defining a function to get the customer name from the query
+def get_customer_name(query):
+    # A regular expression pattern to match customer names
+    name_pattern = r"(name|customer|account holder|user) is (\w+)"
+    # Converting the query to lower case and removing punctuation
+    query = query.lower().strip(".?!")
+    # Searching for the name pattern in the query
+    match = re.search(name_pattern, query)
+    # If a match is found, return the second group (the name)
+    if match:
+        return match.group(2)
+    # Otherwise, return None
+    else:
+        return None
+
+# Defining a function to get the balance of a customer
+def get_balance(customer):
+    # Checking if the customer exists in the data
+    if customer in customers:
+        # Returning the balance of the customer
+        return customers[customer]["balance"]
+    # Otherwise, returning None
+    else:
+        return None
+
+# Defining a function to get the transactions of a customer
+def get_transactions(customer):
+    # Checking if the customer exists in the data
+    if customer in customers:
+        # Getting the account number of the customer
+        account_number = customers[customer]["account_number"]
+        # Returning the transactions of the account number
+        return transactions[account_number]
+    # Otherwise, returning None
+    else:
+        return None
+
+# Defining a function to generate a response for a greeting query
+def respond_to_greeting():
+    # Generating a random greeting response
+    response = random_response(greetings)
+    # Adding a question to ask for the customer name
+    response += ". What is your name?"
+    # Returning the response
+    return response
+
+# Defining a function to generate a response for a farewell query
+def respond_to_farewell():
+    # Generating a random farewell response
+    response = random_response(farewells)
+    # Adding a punctuation mark
+    response += "."
+    # Returning the response
+    return response
+
+# Defining a function to generate a response for a balance query
+def respond_to_balance_query(query):
+    # Getting the customer name from the query
+    customer = get_customer_name(query)
+    # Checking if the customer name is valid
+    if customer:
+        # Getting the balance of the customer
+        balance = get_balance(customer)
+        # Checking if the balance is valid
+        if balance is not None:
+            # Generating a confirmation response with the balance
+            response = random_response(confirmations)
+            response += f". Your balance is {balance} rupees."
+            # Returning the response
+            return response
+        # Otherwise, generating an apology response with an error message
+        else:
+            response = random_response(apologies)
+            response += ". We could not find your account."
+            # Returning the response
+            return response
+    # Otherwise, generating a clarification response with a request for the name
+    else:
+        response = random_response(clarifications)
+        response += ". What is your name?"
+        # Returning the response
+        return response
+
+# Defining a function to generate a response for a transaction query
+def respond_to_transaction_query(query):
+    # Getting the customer name from the query
+    customer = get_customer_name(query)
+    # Checking if the customer name is valid
+    if customer:
+        # Getting the transactions of the customer
+        transactions = get_transactions(customer)
+        # Checking if the transactions are valid
+        if transactions is not None:
+            # Generating a confirmation response with the transactions in a table format
+            response = random_response(confirmations)
+            response += ". Here are your transactions:\n\n"
+            response += "| Date | Amount | Description |\n"
+            response += "|------|--------|-------------|\n"
+            for transaction in transactions:
+                date = transaction["date"]
+                amount = transaction["amount"]
+                description = transaction["description"]
+                response += f"| {date} | {amount} | {description} |\n"
+            # Returning the response
+            return response
+        # Otherwise, generating an apology response with an error message
+        else:
+            response = random_response(apologies)
+            response += ". We could not find your account."
+            # Returning the response
+            return response    
+    # Otherwise, generating a clarification response with a request for the name    
+    else:
+        response = random_response(clarifications)
+        response += ". What is your name?"
+        # Returning the response 
+        return response
+
+# Defining a function to generate a default response for an unknown query 
+def respond_by_default():
+    # Generating an acknowledgement response with a request for more information 
+    response = random_response(acknowledgements)
+    response += ". How can I help you?"
+    # Returning the resposne 
+    return resposne 
